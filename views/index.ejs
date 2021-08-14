@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" class="h-100">
+	<head>
+    	<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    	<meta name="description" content="">
+    	<meta name="author" content="Layout based on work by Mark Otto, Jacob Thornton, and Bootstrap contributors.  Adapted by Neal O'Kelly on behalf of GilbyIM Serices Ltd.">
+    	<title><%- title %></title>
+		<link rel="icon" href="gilbyim.ico">
+		
+		<!-- Bootstrap core CSS -->
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+		
+		<!-- Bootstrap core CSS -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		
+		<!-- Set Environment Variables -->
+		<script>
+			var serviceUrl = "<%- serviceUrl %>";
+	  	</script>
+
+		<!-- Styles -->
+    	<style>
+			
+			main > .container
+				{
+  				padding: 60px 15px 0;
+				}
+
+      		.bd-placeholder-img
+				{
+				font-size: 1.125rem;
+				text-anchor: middle;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				user-select: none;
+				}
+
+		  	@media (min-width: 768px)
+				{
+				.bd-placeholder-img-lg 
+					{
+					font-size: 3.5rem;
+					}
+				}
+		
+			#site-logo
+				{
+				display: inline-block;
+				height: 56px;
+				width: 56px;
+				background-image: url("img/rt_logo.png");
+				background-repeat: no-repeat;
+				background-position: center center;
+				background-size: 100% 100%;
+				margin-top: -.5rem;
+				margin-bottom: -.5rem;
+				margin-left: -.5rem;
+				}
+		
+			.navbar-dark
+				{
+				background-color: #000033 !important;
+				}
+			
+    	</style>
+		
+	</head>
+	<body class="d-flex flex-column h-100">
+	
+		<!-- Fixed navbar -->    
+		<header>
+			<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+				<div class="container-fluid" style="margin-left:-15px;">
+					<span id="site-logo"></span>
+					<a class="navbar-brand" href="<%- serviceUrl %>">OcrMyPdf</a>
+					<div class="collapse navbar-collapse" id="navbarCollapse"></div>
+				</div>
+			</nav>
+		</header>
+
+		<!-- Begin page content -->
+		<main class="flex-shrink-0">
+			<div class="container">
+				<h1 class="mt-5"><%- title %></h1>
+				<p class="lead">This is the service that our OcrMyPdf functionality will use. &nbsp;This graphical user interface is for test purposes only.  If you upload something other than a PDF it ain't going to work. &nbsp;The GilbyIM Lite interface will interact with this service programmatically.<p>
+
+				<p class="lead">Choose a PDF file and click the "OCR it!" button to download a version of your original PDF will OCR text added.</p>
+				<div class="mb-3 row col-12">
+					<label id="upload-label" for="upload" style="display:none;">Choose file...</label>
+					<input id="upload" name="upload" type="file">
+				</div>
+				<div class="mb-3 row col-12">
+					<button id="upload-button" class="btn btn-primary">OCR it!</button>
+				</div>
+			</div>
+		</main>
+
+		<footer class="footer mt-auto py-3 bg-light">
+			<div class="container text-center">
+				<span class="text-muted">&copy; Copyright GilbyIM Services Ltd (2021)</span>
+			</div>
+		</footer>
+		
+		<script>
+			$(document).on("click", "#upload-button", function()
+				{
+				file = $("#upload").prop('files')[0];
+				var fileName = $("#upload").val().substr(12)
+				var extension = getFileExtension($("#upload").val().substr(12))
+				uploadFile(fileName, extension, file)
+				})
+
+			function getFileExtension(fileName)
+				{
+				return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
+				}		
+
+			function uploadFile(fileName, extension, file)
+				{
+				var deferredObject = $.Deferred();
+					var data = new FormData();
+					data.append('file', $('#upload')[0].files[0]);
+						jQuery.ajax(
+							{
+							url: "<%- serviceUrl %>",
+							type: "POST",
+							data: data,
+							processData: false,
+							contentType: false,
+							xhrFields: { responseType: 'arraybuffer'},
+							success: function (result) 
+								{
+								console.log("Success")
+								//console.log(result)
+								var url = window.URL.createObjectURL(new File([result], "download.pdf", {type: "application/pdf"}));
+								var anchorElem = document.createElement("a");
+								anchorElem.style = "display: none";
+								anchorElem.href = url;
+								anchorElem.download = "download.pdf";
+								document.body.appendChild(anchorElem);
+								anchorElem.click();
+								document.body.removeChild(anchorElem);
+								window.URL.revokeObjectURL(url)
+								deferredObject.resolve();
+								},
+							error: function(result) 
+								{
+								console.log("Error")
+								//console.log(result)
+								deferredObject.resolve();
+								}
+							});
+				return deferredObject.promise();
+				}
+
+		</script>
+	</body>
+</html>
