@@ -63,6 +63,11 @@
 				background-color: #000033 !important;
 				}
 			
+			.footer
+				{
+  				background-color: #555 !important;
+				}
+			
     	</style>
 		
 	</head>
@@ -73,7 +78,7 @@
 			<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 				<div class="container-fluid" style="margin-left:-15px;">
 					<span id="site-logo"></span>
-					<a class="navbar-brand" href="<%- serviceUrl %>">OcrMyPdf</a>
+					<a class="navbar-brand" href="<%- serviceUrl %>"><%- title %></a>
 					<div class="collapse navbar-collapse" id="navbarCollapse"></div>
 				</div>
 			</nav>
@@ -85,7 +90,7 @@
 				<h1 class="mt-5"><%- title %></h1>
 				<p class="lead">This is the service that our OcrMyPdf functionality will use. &nbsp;This graphical user interface is for test purposes only.  If you upload something other than a PDF it ain't going to work. &nbsp;The GilbyIM Lite interface will interact with this service programmatically.<p>
 
-				<p class="lead">Choose a PDF file and click the "OCR it!" button to download a version of your original PDF will OCR text added.</p>
+				<p class="lead">Choose a PDF file and click the "OCR it!" button to download a version of your original PDF with OCR text added.</p>
 				<div class="mb-3 row col-12">
 					<label id="upload-label" for="upload" style="display:none;">Choose file...</label>
 					<input id="upload" name="upload" type="file">
@@ -96,9 +101,9 @@
 			</div>
 		</main>
 
-		<footer class="footer mt-auto py-3 bg-light">
+		<footer class="footer mt-auto py-3">
 			<div class="container text-center">
-				<span class="text-muted">&copy; Copyright GilbyIM Services Ltd (2021)</span>
+				<span style="color:white;">&copy; Copyright GilbyIM Services Ltd (2021)</span>
 			</div>
 		</footer>
 		
