@@ -1,4 +1,4 @@
-node-ocr
+GilbyIM OcrMyPdf Service
 ========
 
 `NodeJs v.12` + [OcrMyPdf](https://github.com/jbarlow83/OCRmyPDF) + `pdftotext` Docker Image, [based on Ubuntu image](https://github.com/jbarlow83/OCRmyPDF/blob/master/.docker/Dockerfile). Developed for custom OCR node APIs or workers.
