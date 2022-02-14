@@ -47,27 +47,31 @@ app.listen(servicePort)
 console.log("Server listening on port: " + servicePort)
 
 app.get('/', (req, res) => {
-	res.render('index', { title: pageTitle, serviceUrl: "https://" + req.host + "/ocrmypdf" })
+	console.log("GET " + req.protocol + '://' + req.get('host') + req.originalUrl)
+	res.render('index', { title: pageTitle, serviceUrl: req.protocol + '://' + req.get('host') + req.originalUrl })
 })
 
 app.post('*/', ocrmypdfupload.single('file'), async (req, res) => {
-	if (req.file) {
-		console.log(req.file.path)
-
-		res.download(await doOCR(req.file.path), (err) => {
-			if (err) {
+	console.log("POST: " + req.file.path)
+	if(req.file)
+		{
+		res.download(await doOCR(req.file.path), (err) => 
+				{
+				if(err)
+					{
+					console.log(err)
+					fs.unlinkSync(req.file.path)
+					res.status(501).send({ status: "error", "msg": "An error has ocurred in the OCR process." })
+					}
 				fs.unlinkSync(req.file.path)
-				res.send("An error has occurred in the OCR process.")
-			}
-			fs.unlinkSync(req.file.path)
-		})
-	}
+				})
+		}
 })
 
 /**
  * GET - Health check
  */
-app.get('*/health', (req, res) => res.sendStatus(200))
+app.get('*/healthcheck', (req, res) => res.sendStatus(200))
 
 /**
  * Not Found
@@ -77,10 +81,15 @@ app.use((req, res, next) => res.status(404).send({ status: "error", "msg": "404 
 /**
  * Functions
  */
-async function doOCR(file) {
+async function doOCR(file)
+	{
 	const exec = require('await-exec')
 	const outputFile = file.replace('.pdf', '-ocr.pdf')
-	const ocrResult = await exec(`ocrmypdf -l spa --output-type pdfa --optimize 3 --skip-text ${file} ${outputFile}`, { timeout: 900000 })
+	const ocrResult = await exec(`ocrmypdf -l spa --output-type pdfa --optimize 3 --skip-text ${file} ${outputFile}`, { timeout: 900000 }, function(error, stdout, stderr)
+		{
+		console.log("stdout: " + stdout)
+		console.log("stderr: " + stderr)
+		})
 	return outputFile
 	fs.unlinkSync(outputFile)
-}
+	}
