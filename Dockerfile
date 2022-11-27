@@ -1,36 +1,38 @@
-# cell
+# OS
+FROM ubuntu:22.04
 
-# OS - Ubuntu Based
-FROM jbarlow83/ocrmypdf
+# Install dependencies
+RUN\
+	apt-get update && yes | apt-get install tesseract-ocr-spa 
+	# poppler-utils
 
-# setup
-RUN apt update && apt install -y \
- 	# tesseract language packages
-	tesseract-ocr-spa \
-	poppler-utils curl && \
-	# node LTS
-	curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-	apt install -y nodejs && \
-	# clean
-	apt remove -y curl && \
-	apt clean && \
-	apt autoremove -y
+# Install OCRMYPDF
+RUN\
+	apt-get update && yes | apt-get install ocrmypdf
 
-# change root to home
-WORKDIR /home
+# Install Nodejs
+RUN\
+	apt-get update && yes | apt-get install nodejs &&\
+	apt-get update && yes | apt-get install npm
 
-# node dependcies
+# Create app directory
+RUN\
+	mkdir /usr/src/app
+
+# Set Work Directory
+WORKDIR /usr/src/app
+
+# Node dependcies
 COPY package.json .
-RUN npm install -g pm2 && \
-	npm install --production
+
+RUN\ 
+	npm install
 
 # copy app
 COPY . .
 
-# override entrypoint
-ENTRYPOINT ["/usr/bin/env"]
-
+# Expose the port
 EXPOSE 4000
 
 # start
-CMD pm2-runtime app.js
+CMD ["npm","start"]
