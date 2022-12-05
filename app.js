@@ -7,8 +7,8 @@ const multer = require("multer");
 
 // Express configuration
 const app = express()
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: '50mb',extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(express.static("public"));
 app.use('/css', express.static(__dirname + 'public/css'))
 app.use('/img', express.static(__dirname + 'public/img'))
@@ -24,6 +24,7 @@ var storage = multer.diskStorage(
 		filename: function (req, file, cb) {
 			cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
 		},
+		limits: { fileSize: 20 * 1024 * 1024 }
 	});
 
 const ocrmypdf = function (req, file, callback) {
@@ -43,7 +44,8 @@ const pageTitle = "GilbyIM OcrMyPdf Service"
  * Express
  */
 app.listen(servicePort)
-
+app.keepAliveTimeout = 300 * 1000;
+app.headersTimeout = 300 * 1000;
 console.log("Server listening on port: " + servicePort)
 
 app.get('/', (req, res) => {
